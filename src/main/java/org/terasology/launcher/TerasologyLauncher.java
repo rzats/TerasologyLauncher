@@ -122,6 +122,7 @@ public final class TerasologyLauncher extends Application {
         showSplashStage(initialStage, launcherInitTask);
         Thread initThread = new Thread(launcherInitTask);
         initThread.setName("Launcher init thread");
+        initThread.setUncaughtExceptionHandler((t, e) -> logger.warn("Initialization failed!", e));
 
         launcherInitTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
             @Override
@@ -150,7 +151,9 @@ public final class TerasologyLauncher extends Application {
             } else {
                 exception = new Exception("Wrapped throwable, see deeper", throwable);
             }
-            openCrashReporterAndExit(exception);
+            //TODO: Should we really crash here? The task state is set to "failed" if an exception is thrown, even if
+            //      it is caught...
+            // openCrashReporterAndExit(exception);
         });
 
         initThread.start();
@@ -174,7 +177,8 @@ public final class TerasologyLauncher extends Application {
         logger.error("The TerasologyLauncher could not be started!");
 
         Path logFile = TempLogFilePropertyDefiner.getInstance().getLogFile();
-        CrashReporter.report(e, logFile);
+        //TODO: this hangs on Java 11 instead of showing the CrashReporter
+        // CrashReporter.report(e, logFile);
         System.exit(1);
     }
 

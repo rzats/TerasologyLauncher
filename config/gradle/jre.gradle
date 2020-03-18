@@ -36,12 +36,6 @@ task createRelease() {
     }
 }
 
-task downloadJreAll {
-    group 'Download'
-    description 'Downloads JRE for all platforms'
-    dependsOn downloadJreGame, downloadJreLauncher
-}
-
 task downloadJreGame {
     group 'Download'
     description 'Downloads Game JRE for all platforms'
@@ -50,6 +44,12 @@ task downloadJreGame {
 task downloadJreLauncher {
     group 'Download'
     description 'Downloads Launcher JRE for all platforms'
+}
+
+task downloadJreAll {
+    group 'Download'
+    description 'Downloads JRE for all platforms'
+    dependsOn downloadJreGame, downloadJreLauncher
 }
 
 def createJreTasks(String taskNameBase,
@@ -65,9 +65,9 @@ def createJreTasks(String taskNameBase,
     }
 
     task "unpack$taskNameBase"(type: Copy) {
-        from(file.endsWith("zip")
-                ? zipTree(packedJre)
-                : tarTree(packedJre)) {
+        from(downloadFile.endsWith("zip")
+                ? zipTree(downloadFile)
+                : tarTree(downloadFile)) {
             eachFile { fcd ->
                 fcd.relativePath = new RelativePath(
                         true, fcd.relativePath.segments.drop(1))
